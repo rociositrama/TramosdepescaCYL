@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="data/reasrecreativas_0.js"></script>
+        <script src="data/Tramosdeplanesdepesca_1.js"></script>
+        <script src="data/CastillayLen_2.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[39.983477703044265,-7.307912095449325],[43.329885697530464,-1.5561974140822592]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	minZoom:1, maxZoom: 16,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo (map);
+var pnoa = L.tileLayer.wms("http://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&", {
+	   layers: "OI.OrthoimageCoverage",//nombre de la capa (ver get capabilities)
+	   format: 'image/jpeg',
+	   transparent: true,
+	   version: '1.3.0',//wms version (ver get capabilities)
+	   minZoom:16, maxZoom:22,
+	   attribution: "PNOA WMS. Cedido por © Instituto Geográfico Nacional de España"
+	}).addTo(map);
+map.setView ([41.65,-4.78],8);
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        function pop_reasrecreativas_0(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+					<tr>\
+                        <th scope="row">Nombre</th>\
+                        <td>' + (feature.properties['equip_b_no'] !== null ? autolinker.link(feature.properties['equip_b_no'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+					<tr>\
+                        <th scope="row">Observaciones</th>\
+                        <td>' + (feature.properties['equip_a_ob'] !== null ? autolinker.link(feature.properties['equip_a_ob'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Acceso</th>\
+                        <td>' + (feature.properties['equip_b_ac'] !== null ? autolinker.link(feature.properties['equip_b_ac'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_reasrecreativas_0_0() {
+            return {
+                pane: 'pane_reasrecreativas_0',
+                radius: 2.9333333333333327,
+                opacity: 1,
+                color: 'rgba(7,146,184,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(7,175,184,1.0)',
+                interactive: true,
+            }
+        }
+        function style_reasrecreativas_0_1() {
+            return {
+                pane: 'pane_reasrecreativas_0',
+                radius: 3.1999999999999997,
+                opacity: 1,
+                color: 'rgba(0,29,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(8,0,255,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_reasrecreativas_0');
+        map.getPane('pane_reasrecreativas_0').style.zIndex = 400;
+        map.getPane('pane_reasrecreativas_0').style['mix-blend-mode'] = 'normal';
+        var layer_reasrecreativas_0 = new L.geoJson.multiStyle(json_reasrecreativas_0, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_reasrecreativas_0',
+            layerName: 'layer_reasrecreativas_0',
+            pane: 'pane_reasrecreativas_0',
+            onEachFeature: pop_reasrecreativas_0,
+            pointToLayers: [function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_reasrecreativas_0_0(feature));
+            },function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_reasrecreativas_0_1(feature));
+            },
+        ]});
+        bounds_group.addLayer(layer_reasrecreativas_0);
+        map.addLayer(layer_reasrecreativas_0);
+        function pop_Tramosdeplanesdepesca_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Nombre del tramo</th>\
+                        <td>' + (feature.properties['nombr_tram'] !== null ? autolinker.link(feature.properties['nombr_tram'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Código</th>\
+                        <td>' + (feature.properties['codigo'] !== null ? autolinker.link(feature.properties['codigo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Provinca</th>\
+                        <td>' + (feature.properties['provincia'] !== null ? autolinker.link(feature.properties['provincia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Curso</th>\
+                        <td>' + (feature.properties['rio_mas_ag'] !== null ? autolinker.link(feature.properties['rio_mas_ag'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Categoría</th>\
+                        <td>' + (feature.properties['categoria'] !== null ? autolinker.link(feature.properties['categoria'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Límite Superior</th>\
+                        <td>' + (feature.properties['lim_superi'] !== null ? autolinker.link(feature.properties['lim_superi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Límite inferior</th>\
+                        <td>' + (feature.properties['lim_inferi'] !== null ? autolinker.link(feature.properties['lim_inferi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Longitud (km)</th>\
+                        <td>' + (feature.properties['long_km'] !== null ? autolinker.link(feature.properties['long_km'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Categoría masa de agua</th>\
+                        <td>' + (feature.properties['truchera'] !== null ? autolinker.link(feature.properties['truchera'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cañas</th>\
+                        <td>' + (feature.properties['n_canas'] !== null ? autolinker.link(feature.properties['n_canas'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Modalidad</th>\
+                        <td>' + (feature.properties['modalidad'] !== null ? autolinker.link(feature.properties['modalidad'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Aparatos de foltación</th>\
+                        <td>' + (feature.properties['apar_flota'] !== null ? autolinker.link(feature.properties['apar_flota'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Inicio del periodo de pesca 1</th>\
+                        <td>' + (feature.properties['per1_pec_i'] !== null ? autolinker.link(feature.properties['per1_pec_i'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Final del periodo de pesca 1</th>\
+                        <td>' + (feature.properties['per1_pec_f'] !== null ? autolinker.link(feature.properties['per1_pec_f'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Inicio del periodo de pesca 2</th>\
+                        <td>' + (feature.properties['per2_pec_i'] !== null ? autolinker.link(feature.properties['per2_pec_i'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Final del periodo de pesca 2</th>\
+                        <td>' + (feature.properties['per2_pec_f'] !== null ? autolinker.link(feature.properties['per2_pec_f'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Días permitidos de pesca dentro del periodo 1 Sin Muerte</th>\
+                        <td>' + (feature.properties['dp1_pec_sm'] !== null ? autolinker.link(feature.properties['dp1_pec_sm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Días permitidos de pesca dentro del periodo 1 Con Muerte</th>\
+                        <td>' + (feature.properties['dp1_pec_cm'] !== null ? autolinker.link(feature.properties['dp1_pec_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Días permitidos de pesca dentro del periodo 2 Sin Muerte</th>\
+                        <td>' + (feature.properties['dp2_pec_sm'] !== null ? autolinker.link(feature.properties['dp2_pec_sm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Días permitidos de pesca dentro del periodo 2 Con Muerte</th>\
+                        <td>' + (feature.properties['dp2_pec_cm'] !== null ? autolinker.link(feature.properties['dp2_pec_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Número de pases o permisos para el perido 1 los días Con Muerte</th>\
+                        <td>' + (feature.properties['n_per_dia_'] !== null ? autolinker.link(feature.properties['n_per_dia_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Número de pases o permisos para el perido 1 los días Sin Muerte</th>\
+                        <td>' + (feature.properties['n_per_di_1'] !== null ? autolinker.link(feature.properties['n_per_di_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Número de pases o permisos para el perido 2 los días Con Muerte</th>\
+                        <td>' + (feature.properties['n_per_di_2'] !== null ? autolinker.link(feature.properties['n_per_di_2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Número de pases o permisos para el perido 2 los días Sin Muerte</th>\
+                        <td>' + (feature.properties['n_per_di_3'] !== null ? autolinker.link(feature.properties['n_per_di_3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima trucha común</th>\
+                        <td>' + (feature.properties['truch_cm'] !== null ? autolinker.link(feature.properties['truch_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día trucha común</th>\
+                        <td>' + (feature.properties['truch_cup_'] !== null ? autolinker.link(feature.properties['truch_cup_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima barbo común</th>\
+                        <td>' + (feature.properties['barbo_cm'] !== null ? autolinker.link(feature.properties['barbo_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día barbo común</th>\
+                        <td>' + (feature.properties['barb_cup_d'] !== null ? autolinker.link(feature.properties['barb_cup_d'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima ciprinidos ibéricos</th>\
+                        <td>' + (feature.properties['cipr_ib_cm'] !== null ? autolinker.link(feature.properties['cipr_ib_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día ciprinidos ibéricos</th>\
+                        <td>' + (feature.properties['ci_cup_dia'] !== null ? autolinker.link(feature.properties['ci_cup_dia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima gobio y piscardo</th>\
+                        <td>' + (feature.properties['gob_pis_cm'] !== null ? autolinker.link(feature.properties['gob_pis_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día gobio y piscardo</th>\
+                        <td>' + (feature.properties['gp_cup_dia'] !== null ? autolinker.link(feature.properties['gp_cup_dia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima carpín</th>\
+                        <td>' + (feature.properties['carpin_cm'] !== null ? autolinker.link(feature.properties['carpin_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día carpín</th>\
+                        <td>' + (feature.properties['carp_cup_d'] !== null ? autolinker.link(feature.properties['carp_cup_d'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima tenca</th>\
+                        <td>' + (feature.properties['tenca_cm'] !== null ? autolinker.link(feature.properties['tenca_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día tenca</th>\
+                        <td>' + (feature.properties['tenc_cup_d'] !== null ? autolinker.link(feature.properties['tenc_cup_d'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima hucho</th>\
+                        <td>' + (feature.properties['hucho_cm'] !== null ? autolinker.link(feature.properties['hucho_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día hucho</th>\
+                        <td>' + (feature.properties['huch_cup_d'] !== null ? autolinker.link(feature.properties['huch_cup_d'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Talla mínima especies exóticas invasoras</th>\
+                        <td>' + (feature.properties['exo_inv_cm'] !== null ? autolinker.link(feature.properties['exo_inv_cm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cupo máximo por día especies exóticas invasoras</th>\
+                        <td>' + (feature.properties['eei_cup_di'] !== null ? autolinker.link(feature.properties['eei_cup_di'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cebos y señuelos permitidos Con Muerte</th>\
+                        <td>' + (feature.properties['cys_dcm_pe'] !== null ? autolinker.link(feature.properties['cys_dcm_pe'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cebos y señuelos prohibidos Con Muerte</th>\
+                        <td>' + (feature.properties['cys_dcm_pr'] !== null ? autolinker.link(feature.properties['cys_dcm_pr'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cebos y señuelos permitidos Sin Muerte</th>\
+                        <td>' + (feature.properties['cebos_sm'] !== null ? autolinker.link(feature.properties['cebos_sm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Otras limitaciones</th>\
+                        <td>' + (feature.properties['otr_limita'] !== null ? autolinker.link(feature.properties['otr_limita'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Permitida la pesca del cangrejo</th>\
+                        <td>' + (feature.properties['pes_cangre'] !== null ? autolinker.link(feature.properties['pes_cangre'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Inicio del periodo de pesca del cangrejo 1</th>\
+                        <td>' + (feature.properties['per1_cang_'] !== null ? autolinker.link(feature.properties['per1_cang_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Final del periodo de pesca del cangrejo 1</th>\
+                        <td>' + (feature.properties['per1_can_1'] !== null ? autolinker.link(feature.properties['per1_can_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Inicio del periodo de pesca del cangrejo 2</th>\
+                        <td>' + (feature.properties['per2_cang_'] !== null ? autolinker.link(feature.properties['per2_cang_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Final del periodo de pesca del cangrejo 2</th>\
+                        <td>' + (feature.properties['per2_can_1'] !== null ? autolinker.link(feature.properties['per2_can_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['dp1_cang_c'] !== null ? autolinker.link(feature.properties['dp1_cang_c'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Días permitidos de pesca del cangrejo dentro del periodo 2 Sin Muerte</th>\
+                        <td>' + (feature.properties['dp2_cang_c'] !== null ? autolinker.link(feature.properties['dp2_cang_c'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cebos y señuelos permitidos pesca del cangrejo</th>\
+                        <td>' + (feature.properties['ceb_cangr_'] !== null ? autolinker.link(feature.properties['ceb_cangr_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cebos y señuelos prohibidos pesca del cangrejo</th>\
+                        <td>' + (feature.properties['ceb_cang_1'] !== null ? autolinker.link(feature.properties['ceb_cang_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Tramosdeplanesdepesca_1_0(feature) {
+            switch(String(feature.properties['categoria'])) {
+                case 'Agua en Régimen Especial con Extracción Controlada':
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(241,245,2,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Aguas en Régimen Especial':
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(244,252,121,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Coto de pesca':
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(235,32,21,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Escenario Deportivo Social':
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(245,128,3,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Excepciones fecha de inicio y cierre':
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(54,164,11,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Refugio de pesca':
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(179,68,215,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Tramosdeplanesdepesca_1',
+                opacity: 1,
+                color: 'rgba(253,231,37,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Tramosdeplanesdepesca_1');
+        map.getPane('pane_Tramosdeplanesdepesca_1').style.zIndex = 401;
+        map.getPane('pane_Tramosdeplanesdepesca_1').style['mix-blend-mode'] = 'normal';
+        var layer_Tramosdeplanesdepesca_1 = new L.geoJson(json_Tramosdeplanesdepesca_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Tramosdeplanesdepesca_1',
+            layerName: 'layer_Tramosdeplanesdepesca_1',
+            pane: 'pane_Tramosdeplanesdepesca_1',
+            onEachFeature: pop_Tramosdeplanesdepesca_1,
+            style: style_Tramosdeplanesdepesca_1_0,
+        });
+        bounds_group.addLayer(layer_Tramosdeplanesdepesca_1);
+        map.addLayer(layer_Tramosdeplanesdepesca_1);
+        function pop_CastillayLen_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_PROV'] !== null ? autolinker.link(feature.properties['COD_PROV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_PROV'] !== null ? autolinker.link(feature.properties['NOM_PROV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CastillayLen_2_0() {
+            return {
+                pane: 'pane_CastillayLen_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_CastillayLen_2');
+        map.getPane('pane_CastillayLen_2').style.zIndex = 402;
+        map.getPane('pane_CastillayLen_2').style['mix-blend-mode'] = 'normal';
+        var layer_CastillayLen_2 = new L.geoJson(json_CastillayLen_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_CastillayLen_2',
+            layerName: 'layer_CastillayLen_2',
+            pane: 'pane_CastillayLen_2',
+            onEachFeature: pop_CastillayLen_2,
+            style: style_CastillayLen_2_0,
+        });
+        bounds_group.addLayer(layer_CastillayLen_2);
+        map.addLayer(layer_CastillayLen_2);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/CastillayLen_2.png" /> Castilla y León': layer_CastillayLen_2,'Tramos de planes de pesca<br /><table><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_AguaenRégimenEspecialconExtracciónControlada0.png" /></td><td>Agua en Régimen Especial con Extracción Controlada</td></tr><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_AguasenRégimenEspecial1.png" /></td><td>Aguas en Régimen Especial</td></tr><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_Cotodepesca2.png" /></td><td>Coto de pesca</td></tr><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_EscenarioDeportivoSocial3.png" /></td><td>Escenario Deportivo Social</td></tr><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_Excepcionesfechadeinicioycierre4.png" /></td><td>Excepciones fecha de inicio y cierre</td></tr><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_Refugiodepesca5.png" /></td><td>Refugio de pesca</td></tr><tr><td style="text-align: center;"><img src="legend/Tramosdeplanesdepesca_1_6.png" /></td><td></td></tr></table>': layer_Tramosdeplanesdepesca_1,'<img src="legend/reasrecreativas_0.png" /> Áreas recreativas': layer_reasrecreativas_0,}).addTo(map);
+        map.on("zoomend", function(){
+
+                if (map.hasLayer(layer_reasrecreativas_0)) {
+                    if (map.getZoom() <= 8 && map.getZoom() >= 19) {
+                        layer_reasrecreativas_0.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_reasrecreativas_0.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_Tramosdeplanesdepesca_1)) {
+                    if (map.getZoom() <= 8 && map.getZoom() >= 19) {
+                        layer_Tramosdeplanesdepesca_1.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_Tramosdeplanesdepesca_1.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+        });
+        setBounds();
+        var i = 0;
+        layer_reasrecreativas_0.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['q2wHide_atr_gr_id'] !== null?String('<div style="color: #000000; font-size: 10pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['q2wHide_atr_gr_id']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_reasrecreativas_0'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_Tramosdeplanesdepesca_1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['categoria'] !== null?String('<div style="color: #000000; font-size: 10pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['categoria']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Tramosdeplanesdepesca_1'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+                if (map.hasLayer(layer_reasrecreativas_0)) {
+                    if (map.getZoom() <= 8 && map.getZoom() >= 19) {
+                        layer_reasrecreativas_0.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_reasrecreativas_0.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+                if (map.hasLayer(layer_Tramosdeplanesdepesca_1)) {
+                    if (map.getZoom() <= 8 && map.getZoom() >= 19) {
+                        layer_Tramosdeplanesdepesca_1.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_Tramosdeplanesdepesca_1.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+        map.addControl(new L.Control.Search({
+            layer: layer_Tramosdeplanesdepesca_1,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'rio_mas_ag'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        resetLabels([layer_reasrecreativas_0,layer_Tramosdeplanesdepesca_1]);
+        map.on("zoomend", function(){
+            resetLabels([layer_reasrecreativas_0,layer_Tramosdeplanesdepesca_1]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_reasrecreativas_0,layer_Tramosdeplanesdepesca_1]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_reasrecreativas_0,layer_Tramosdeplanesdepesca_1]);
+        });
+        </script>
+    </body>
+</html>
